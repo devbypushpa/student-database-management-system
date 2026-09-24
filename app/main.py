@@ -6,6 +6,11 @@ from .routers import students
 from .services.gemini_service import ask_gemini
 from .chatbot.workflow import create_chatbot
 from .services.student_retrieval import get_all_students
+from .services.vector_database import add_students_to_vector_db
+from .services.vector_database import (
+    add_students_to_vector_db,
+    search_students_in_vector_db
+)
 
 
 Base.metadata.create_all(bind=engine)
@@ -75,6 +80,9 @@ from pydantic import BaseModel
 class ChatRequest(BaseModel):
     question: str
 
+class SearchRequest(BaseModel):
+    query: str
+
 
 @app.post("/chatbot")
 def chatbot(request: ChatRequest):
@@ -90,3 +98,19 @@ def chatbot(request: ChatRequest):
         "question": request.question,
         "answer": result["answer"]
     }
+
+@app.post("/vector-db/sync")
+def sync_students_to_vector_db():
+
+    result = add_students_to_vector_db()
+
+    return result
+
+@app.post("/vector-db/search")
+def search_vector_database(request: SearchRequest):
+
+    result = search_students_in_vector_db(
+        request.query
+    )
+
+    return result
