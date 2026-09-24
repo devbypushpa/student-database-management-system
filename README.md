@@ -62,3 +62,22 @@ python -m pytest -v
 - Gemini integration completed
 - LangGraph chatbot completed
 - Automated tests completed
+
+
+## Vector Database Selection
+
+For this project, ChromaDB is being considered for semantic search and student information retrieval.
+
+### Why ChromaDB?
+
+- Beginner-friendly vector database
+- Supports persistent storage
+- Can store document embeddings and metadata
+- Useful for Retrieval-Augmented Generation (RAG) applications
+- Can be integrated with a chatbot workflow
+
+### Planned Use
+
+ChromaDB may be used to retrieve relevant student information based on the meaning of a user's question.
+
+The existing SQLite database will remain responsible for structured student records and CRUD operations.
