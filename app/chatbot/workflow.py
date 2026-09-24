@@ -1,9 +1,13 @@
+
 from typing import TypedDict
 
 from langgraph.graph import StateGraph, START, END
 
 from ..services.gemini_service import ask_gemini
-from ..services.student_retrieval import get_all_students
+from ..services.student_retrieval import (
+    get_all_students,
+    search_student_by_name
+)
 
 
 class ChatState(TypedDict):
@@ -17,16 +21,45 @@ def chatbot_node(state: ChatState):
 
     students = get_all_students()
 
-    student_context = "\n".join(
-        [
-            f"ID: {student['id']}, "
-            f"Name: {student['name']}, "
-            f"Age: {student['age']}, "
-            f"Course: {student['course']}, "
-            f"Email: {student['email']}"
-            for student in students
-        ]
-    )
+    matched_students = []
+
+    for student in students:
+
+        student_name = student["name"].lower()
+
+        if student_name in question.lower():
+
+            matched_students = search_student_by_name(
+                student["name"]
+            )
+
+            break
+
+    if matched_students:
+
+        student_context = "\n".join(
+            [
+                f"ID: {student['id']}, "
+                f"Name: {student['name']}, "
+                f"Age: {student['age']}, "
+                f"Course: {student['course']}, "
+                f"Email: {student['email']}"
+                for student in matched_students
+            ]
+        )
+
+    else:
+
+        student_context = "\n".join(
+            [
+                f"ID: {student['id']}, "
+                f"Name: {student['name']}, "
+                f"Age: {student['age']}, "
+                f"Course: {student['course']}, "
+                f"Email: {student['email']}"
+                for student in students
+            ]
+        )
 
     prompt = f"""
 You are a student database assistant.
@@ -47,6 +80,7 @@ clearly say that it is not available.
     answer = ask_gemini(prompt)
 
     return {
+        "question": question,
         "answer": answer
     }
 
