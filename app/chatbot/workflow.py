@@ -4,10 +4,8 @@ from typing import TypedDict
 from langgraph.graph import StateGraph, START, END
 
 from ..services.gemini_service import ask_gemini
-from ..services.student_retrieval import (
-    get_all_students,
-    search_student_by_name
-)
+from ..services.student_retrieval import get_all_students
+from ..services.vector_database import search_students_in_vector_db
 
 
 class ChatState(TypedDict):
@@ -19,36 +17,40 @@ def chatbot_node(state: ChatState):
 
     question = state["question"]
 
-    students = get_all_students()
+    # Search relevant student information
+    # using ChromaDB vector search.
 
-    matched_students = []
+    try:
 
-    for student in students:
-
-        student_name = student["name"].lower()
-
-        if student_name in question.lower():
-
-            matched_students = search_student_by_name(
-                student["name"]
-            )
-
-            break
-
-    if matched_students:
-
-        student_context = "\n".join(
-            [
-                f"ID: {student['id']}, "
-                f"Name: {student['name']}, "
-                f"Age: {student['age']}, "
-                f"Course: {student['course']}, "
-                f"Email: {student['email']}"
-                for student in matched_students
-            ]
+        vector_results = search_students_in_vector_db(
+            question
         )
 
-    else:
+        documents = vector_results.get(
+            "documents", []
+        )
+
+        if documents and documents[0]:
+
+            student_context = "\n".join(
+                documents[0]
+            )
+
+        else:
+
+            student_context = ""
+
+    except Exception:
+
+        student_context = ""
+
+
+    # Fallback to SQL database if
+    # vector search does not return results.
+
+    if not student_context:
+
+        students = get_all_students()
 
         student_context = "\n".join(
             [
@@ -61,21 +63,28 @@ def chatbot_node(state: ChatState):
             ]
         )
 
+
     prompt = f"""
 You are a student database assistant.
 
-Here is the student database information:
+Use the following student database information
+to answer the user's question.
+
+Student database information:
 
 {student_context}
 
-Answer the following question using the database information
-when required.
+Instructions:
+
+1. Answer using the available database information.
+2. Do not invent student details.
+3. If the requested information is not available,
+   clearly say that it is not available.
+4. Give a simple and clear answer.
 
 Question: {question}
-
-If the information is not available in the database,
-clearly say that it is not available.
 """
+
 
     answer = ask_gemini(prompt)
 
@@ -89,9 +98,19 @@ def create_chatbot():
 
     graph = StateGraph(ChatState)
 
-    graph.add_node("chatbot", chatbot_node)
+    graph.add_node(
+        "chatbot",
+        chatbot_node
+    )
 
-    graph.add_edge(START, "chatbot")
-    graph.add_edge("chatbot", END)
+    graph.add_edge(
+        START,
+        "chatbot"
+    )
+
+    graph.add_edge(
+        "chatbot",
+        END
+    )
 
     return graph.compile()
