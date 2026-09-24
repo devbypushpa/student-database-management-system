@@ -1,83 +1,182 @@
 
 # Student Database Management System
 
-A backend API project for managing student information using Python and FastAPI.
+A modular backend application for managing student records through REST APIs, database operations, AI-powered assistance, and vector search.
+
+## Project Overview
+
+The Student Database Management System is developed using Python and FastAPI. It provides APIs for managing student information and includes Gemini AI, LangGraph, and ChromaDB integration.
 
 ## Features
 
 - Create student records
-- Retrieve student records
+- Retrieve all students
+- Retrieve a student by ID
 - Update student information
 - Delete student records
 - Input validation using Pydantic
-- SQLite database using SQLAlchemy
-- Interactive API documentation using Swagger
-- Gemini AI integration
-- LangGraph chatbot integration
-- Student information retrieval
+- Duplicate email validation
+- SQLite database integration
+- FastAPI Swagger/OpenAPI documentation
+- Gemini API integration
+- LangGraph chatbot workflow
+- Student database retrieval
+- ChromaDB vector database integration
+- Automated testing using Pytest
 
 ## Technologies Used
 
-- Python
-- FastAPI
-- SQLAlchemy
-- SQLite
-- Pydantic
-- Google Gemini API
-- LangGraph
-- Pytest
+| Technology | Purpose |
+|---|---|
+| Python | Backend programming |
+| FastAPI | REST API development |
+| SQLAlchemy | Database operations |
+| SQLite | Student data storage |
+| Pydantic | Data validation |
+| Google Gemini API | AI responses |
+| LangGraph | Chatbot workflow |
+| ChromaDB | Vector database |
+| Pytest | Automated testing |
+| Git & GitHub | Version control |
 
-## API Documentation
+## Project Structure
 
-After running the application, open:
+```text
+STUDENT-DATABASE/
+│
+├── app/
+│   ├── database/
+│   │   ├── database.py
+│   │   └── models.py
+│   │
+│   ├── schemas/
+│   │   └── student.py
+│   │
+│   ├── routers/
+│   │   └── students.py
+│   │
+│   ├── services/
+│   │   ├── gemini_service.py
+│   │   ├── student_retrieval.py
+│   │   └── vector_database.py
+│   │
+│   ├── chatbot/
+│   │   └── workflow.py
+│   │
+│   └── main.py
+│
+├── tests/
+│   └── test_students.py
+│
+├── .env
+├── .gitignore
+├── requirements.txt
+└── README.md
+```
 
-http://127.0.0.1:8000/docs
+## Installation
 
-## Run the Project
-
-Activate the virtual environment:
+### 1. Clone the repository
 
 ```bash
+git clone https://github.com/devbypushpa/student-database-management-system.git
+```
+
+### 2. Open the project folder
+
+```bash
+cd student-database-management-system
+```
+
+### 3. Create a virtual environment
+
+```bash
+python -m venv venv
+```
+
+### 4. Activate the virtual environment on Windows
+
+```powershell
 venv\Scripts\activate
 ```
 
-Start the FastAPI server:
+### 5. Install dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+## Environment Variables
+
+Create a `.env` file in the project root:
+
+```env
+GEMINI_API_KEY=your_gemini_api_key
+```
+
+Never share your API key or commit the `.env` file to GitHub.
+
+## Run the Application
 
 ```bash
 uvicorn app.main:app --reload
 ```
 
+## API Documentation
+
+After starting the server, open:
+
+```text
+http://127.0.0.1:8000/docs
+```
+
+FastAPI provides interactive Swagger documentation for testing the APIs.
+
+## Main API Endpoints
+
+| Method | Endpoint | Purpose |
+|---|---|---|
+| POST | `/students/` | Create a student |
+| GET | `/students/` | Get all students |
+| GET | `/students/{student_id}` | Get student by ID |
+| PUT | `/students/{student_id}` | Update a student |
+| DELETE | `/students/{student_id}` | Delete a student |
+| GET | `/students-data-test` | Retrieve student data |
+| POST | `/chatbot` | Ask the AI chatbot |
+| GET | `/gemini-test` | Test Gemini integration |
+| GET | `/chatbot-test` | Test LangGraph chatbot |
+| POST | `/vector-db/sync` | Sync students to ChromaDB |
+| POST | `/vector-db/search` | Search the vector database |
+
 ## Testing
 
-Run automated tests:
+Run the automated tests using:
 
 ```bash
 python -m pytest -v
 ```
 
-## Project Status
+The project includes tests for:
 
-- CRUD operations completed
-- Input validation completed
-- Gemini integration completed
-- LangGraph chatbot completed
-- Automated tests completed
+- Student validation
+- Invalid age
+- Invalid email
+- Retrieving students
+- Student not found
+- Creating a student
+- Duplicate email validation
 
+## Future Improvements
 
-## Vector Database Selection
+- Authentication and authorization
+- Role-based access control
+- Improved chatbot query routing
+- Frontend interface
+- Advanced student search and filtering
+- Production deployment
 
-For this project, ChromaDB is being considered for semantic search and student information retrieval.
+## Author
 
-### Why ChromaDB?
+**Pushpa Topno**
 
-- Beginner-friendly vector database
-- Supports persistent storage
-- Can store document embeddings and metadata
-- Useful for Retrieval-Augmented Generation (RAG) applications
-- Can be integrated with a chatbot workflow
-
-### Planned Use
-
-ChromaDB may be used to retrieve relevant student information based on the meaning of a user's question.
-
-The existing SQLite database will remain responsible for structured student records and CRUD operations.
+GitHub: [devbypushpa](https://github.com/devbypushpa)
